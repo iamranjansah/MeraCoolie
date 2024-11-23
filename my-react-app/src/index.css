@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add this to your global CSS file (e.g., index.css) */
+@keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .menu-slide {
+    animation: slideIn 0.3s ease-in-out forwards;
+  }
+  
+  .menu-slide-out {
+    animation: slideOut 0.3s ease-in-out forwards;
+  }
+  
