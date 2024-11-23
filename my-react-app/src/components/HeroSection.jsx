@@ -1,5 +1,6 @@
 // src/components/HeroSection.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -28,7 +29,10 @@ const HeroSection = () => {
             className="w-full px-4 py-3 text-lg border rounded-full shadow focus:outline-none focus:ring focus:ring-blue-300"
           />
           <button className="absolute right-2 top-2 bg-blue-500 text-white p-2 rounded-full shadow-md hover:bg-blue-600">
-            🔍
+          <Link to="/booking" className="text-white hover:text-blue-300">
+          🔍
+          </Link>
+            
           </button>
         </div>
       </div>

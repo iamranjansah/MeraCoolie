@@ -1,5 +1,8 @@
 // src/components/Navbar.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,22 +39,24 @@ const Navbar = () => {
         <a href="/" className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
           Home
         </a>
-        <a href="#about" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+        <a href="/about" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
           About Us
         </a>
-        <a href="#booking" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+        <a href="/booking" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
           Booking
         </a>
-        <a href="#services" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+        <a href="/services" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
           Services
         </a>
-        <a href="#contact" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+        <a href="/contact" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
           Contact Us
         </a>
 
         {/* Sign In Button */}
         <button onClick={toggleMenu} className="block py-2 px-4 bg-yellow-400 text-white rounded-full shadow-md hover:bg-yellow-500 w-3/4 mx-auto mt-4 text-center lg:w-auto lg:mt-0 lg:px-6 lg:py-2">
-          Sign In
+        <Link to="/singup" className="text-white hover:text-blue-300">
+        Sign In
+          </Link> 
         </button>
       </nav>
 

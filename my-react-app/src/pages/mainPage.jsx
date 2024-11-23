@@ -1,25 +1,7 @@
 import React, { useState } from "react";
 import Steps from "../components/steps";
-import AboutUs from "../components/aboutUs";
-import Booking from "../components/bookingPage";
 import Services from "../components/Services";
-import Navbar from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
-import LoginPage from "../authPages/LoginPage";
-import Register from "../authPages/Register"
-import ForgotPasswordPage from "../authPages/ForgotPasswordPage";
-import UpdatePasswordPage from "../authPages/UpdatePasswordPage";
-import CoolieRegister from "../usersRegistration/CoolieRegister";
-import CoolieProfile from "../usersRegistration/CoolieProfile";
-import Profile from "../usersRegistration/UserProfile";
-import ClientBookingPage from "../bookingHistory/ClientBookingPage";
-import CoolieBookingPage from "../bookingHistory/CoolieBookingPage";
-import AdminPanel from "./AdminPanel";
-import PaymentCheckout from "../payment/PaymentCheckout";
-import NotificationsPage from "../notifications/NotificationsPage";
-import SearchAndFilterPage from "../searchAndFilter/SearchAndFilterPage";
-
-
 
 function MainPage() {
   const [showSteps, setShowSteps] = useState(false);
@@ -30,29 +12,10 @@ function MainPage() {
 
   return (
     <>
-      <Navbar />
-      {/* <Register/> */}
-      {/* <LoginPage/> */}
-      {/* <ForgotPasswordPage/> */}
-      {/* <UpdatePasswordPage/> */}
-      {/* <CoolieRegister/> */}
-      {/* <CoolieProfile/> */}
-      {/* <Profile/> */}
-      {/* <ClientBookingPage/> */}
-      {/* <CoolieBookingPage/> */}
-      {/* <AdminPanel/> */}
-      <SearchAndFilterPage/>
-      
+    
+      <HeroSection/>
 
-      
-
-
-
-
-      {/* <HeroSection/> */}
-
-      {/* <AboutUs /> */}
-      {/* <div className="mt-10 w-full flex flex-col items-center">
+      <div className="mt-10 w-full flex flex-col items-center">
        
         <h3 className="text-2xl font-bold text-gray-800">
           Steps for Booking Coolie
@@ -63,12 +26,11 @@ function MainPage() {
         >
           {showSteps ? "Hide Steps" : "Show Steps"}
         </button>
-      </div> */}
+      </div>
 
-      {/* {showSteps && <Steps />} */}
-
-      {/* <Booking/> */}
-      {/* <Services/> */}
+      {showSteps && <Steps />}
+      <Services/>
+      
     </>
   );
 }

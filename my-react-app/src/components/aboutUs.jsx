@@ -1,10 +1,11 @@
 // src/pages/AboutUs.jsx
 import React from "react";
 import { FaRegHandshake, FaUser, FaRocket } from "react-icons/fa"; // Importing icons from react-icons
+import { Link } from "react-router-dom";
 
 const AboutUs = () => {
   return (
-    <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center py-12 px-6">
+    <div className="w-full min-h-screen  flex flex-col items-center py-12 px-6">
       {/* Heading */}
       <h2 className="text-3xl font-bold text-blue-500 mb-6 text-center">
         About Us
@@ -73,7 +74,9 @@ const AboutUs = () => {
       {/* CTA Section */}
       <div className="mt-8">
         <button className="px-8 py-3 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-full font-bold hover:from-teal-400 hover:to-blue-500 transform transition duration-300">
-          Book a Coolie Now
+        <Link to="/booking" className="text-white hover:text-blue-300">
+        Book a Coolie Now
+          </Link>
         </button>
       </div>
     </div>
