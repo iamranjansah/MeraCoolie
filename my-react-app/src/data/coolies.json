@@ -1,0 +1,52 @@
+
+[
+    {
+      "id": 1,
+      "fullName": "John Doe",
+      "location": "Mumbai, India",
+      "rating": 4.5,
+      "profilePicture": "https://www.example.com/profile1.jpg",
+      "available": true
+    },
+    {
+      "id": 2,
+      "fullName": "Jane Smith",
+      "location": "Pune, India",
+      "rating": 4.0,
+      "profilePicture": "https://www.example.com/profile2.jpg",
+      "available": true
+    },
+    {
+      "id": 2,
+      "fullName": "Jane Smith",
+      "location": "Pune, India",
+      "rating": 4.0,
+      "profilePicture": "https://www.example.com/profile2.jpg",
+      "available": true
+    },
+    {
+      "id": 2,
+      "fullName": "Jane Smith",
+      "location": "Pune, India",
+      "rating": 4.0,
+      "profilePicture": "https://www.example.com/profile2.jpg",
+      "available": true
+    },
+    {
+      "id": 2,
+      "fullName": "Jane Smith",
+      "location": "Pune, India",
+      "rating": 4.0,
+      "profilePicture": "https://www.example.com/profile2.jpg",
+      "available": true
+    },
+    {
+      "id": 3,
+      "fullName": "Raj Kumar",
+      "location": "Delhi, India",
+      "rating": 4.8,
+      "profilePicture": "https://www.example.com/profile3.jpg",
+      "available": false
+    }
+  ]
+  

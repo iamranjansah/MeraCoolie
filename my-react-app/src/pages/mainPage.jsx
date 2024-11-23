@@ -1,20 +1,27 @@
 import React, { useState } from "react";
-import Steps from "../pages/steps";
-import AboutUs from "./aboutUs";
-import Booking from "./bookingPage";
-import Services from "./Services";
-import Navbar from "./Navbar";
-import HeroSection from "./HeroSection";
+import Steps from "../components/steps";
+import AboutUs from "../components/aboutUs";
+import Booking from "../components/bookingPage";
+import Services from "../components/Services";
+import Navbar from "../components/Navbar";
+import HeroSection from "../components/HeroSection";
 import LoginPage from "../authPages/LoginPage";
 import Register from "../authPages/Register"
 import ForgotPasswordPage from "../authPages/ForgotPasswordPage";
 import UpdatePasswordPage from "../authPages/UpdatePasswordPage";
 import CoolieRegister from "../usersRegistration/CoolieRegister";
 import CoolieProfile from "../usersRegistration/CoolieProfile";
+import Profile from "../usersRegistration/UserProfile";
+import ClientBookingPage from "../bookingHistory/ClientBookingPage";
+import CoolieBookingPage from "../bookingHistory/CoolieBookingPage";
+import AdminPanel from "./AdminPanel";
+import PaymentCheckout from "../payment/PaymentCheckout";
+import NotificationsPage from "../notifications/NotificationsPage";
+import SearchAndFilterPage from "../searchAndFilter/SearchAndFilterPage";
 
 
 
-function App() {
+function MainPage() {
   const [showSteps, setShowSteps] = useState(false);
 
   const toggleSteps = () => {
@@ -29,7 +36,14 @@ function App() {
       {/* <ForgotPasswordPage/> */}
       {/* <UpdatePasswordPage/> */}
       {/* <CoolieRegister/> */}
-      <CoolieProfile/>
+      {/* <CoolieProfile/> */}
+      {/* <Profile/> */}
+      {/* <ClientBookingPage/> */}
+      {/* <CoolieBookingPage/> */}
+      {/* <AdminPanel/> */}
+      <SearchAndFilterPage/>
+      
+
       
 
 
@@ -59,4 +73,4 @@ function App() {
   );
 }
 
-export default App;
+export default MainPage;

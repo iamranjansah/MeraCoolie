@@ -1,0 +1,103 @@
+[
+    {
+      "id": 1,
+      "name": "John Doe",
+      "location": "Mumbai, India",
+      "experience": 5,
+      "rating": 4.5,
+      "availability": "Online",
+      "type": "Heavy",
+      "profilePicture": "https://www.iamranjansah.me/static/media/profile.4501f7d2566b2fd11cf5.png"
+    },
+    {
+      "id": 2,
+      "name": "Amit Patel",
+      "location": "Delhi, India",
+      "experience": 3,
+      "rating": 4.2,
+      "availability": "Offline",
+      "type": "Light",
+      "profilePicture": "https://www.example.com/profile2.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Ravi Kumar",
+      "location": "Bangalore, India",
+      "experience": 7,
+      "rating": 4.8,
+      "availability": "Online",
+      "type": "Medium",
+      "profilePicture": "https://www.example.com/profile3.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Suresh Reddy",
+      "location": "Hyderabad, India",
+      "experience": 2,
+      "rating": 3.9,
+      "availability": "Offline",
+      "type": "Light",
+      "profilePicture": "https://www.example.com/profile4.jpg"
+    },
+    {
+      "id": 5,
+      "name": "Priya Sharma",
+      "location": "Chennai, India",
+      "experience": 6,
+      "rating": 4.7,
+      "availability": "Online",
+      "type": "Heavy",
+      "profilePicture": "https://www.example.com/profile5.jpg"
+    },
+    {
+      "id": 6,
+      "name": "Vikram Singh",
+      "location": "Pune, India",
+      "experience": 4,
+      "rating": 4.3,
+      "availability": "Online",
+      "type": "Medium",
+      "profilePicture": "https://www.example.com/profile6.jpg"
+    },
+    {
+      "id": 7,
+      "name": "Anjali Gupta",
+      "location": "Ahmedabad, India",
+      "experience": 1,
+      "rating": 4.0,
+      "availability": "Offline",
+      "type": "Light",
+      "profilePicture": "https://www.example.com/profile7.jpg"
+    },
+    {
+      "id": 8,
+      "name": "Nitin Kapoor",
+      "location": "Kolkata, India",
+      "experience": 8,
+      "rating": 5.0,
+      "availability": "Online",
+      "type": "Heavy",
+      "profilePicture": "https://www.example.com/profile8.jpg"
+    },
+    {
+      "id": 9,
+      "name": "Sanjay Soni",
+      "location": "Surat, India",
+      "experience": 3,
+      "rating": 4.4,
+      "availability": "Offline",
+      "type": "Medium",
+      "profilePicture": "https://www.example.com/profile9.jpg"
+    },
+    {
+      "id": 10,
+      "name": "Geeta Rawat",
+      "location": "Jaipur, India",
+      "experience": 5,
+      "rating": 4.6,
+      "availability": "Online",
+      "type": "Heavy",
+      "profilePicture": "https://www.example.com/profile10.jpg"
+    }
+  ]
+  
