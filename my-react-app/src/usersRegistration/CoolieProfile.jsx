@@ -186,6 +186,22 @@ const CoolieProfile = () => {
                 <p className="text-gray-800">{coolieData.availability}</p>
               )}
             </div>
+
+            {/* Location */}
+            <div className="w-full md:w-1/2">
+              <label className="block text-gray-700 font-semibold">Location:</label>
+              {editMode ? (
+                <input
+                  type="text"
+                  name="location"
+                  value={coolieData.location}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                />
+              ) : (
+                <p className="text-gray-800">{coolieData.location}</p>
+              )}
+            </div>
           </div>
 
           {/* Rating */}
