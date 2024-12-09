@@ -10,13 +10,14 @@ import LoginPage from "./authPages/LoginPage"; // Clerk's LoginPage
 import SignupPage from "./authPages/SignupPage"; // Clerk's SignupPage
 import CoolieRegister from "./usersRegistration/CoolieRegister";
 import CoolieProfile from "./usersRegistration/CoolieProfile";
-import ClientBookingPage from "./bookingHistory/ClientBookingPage";
+import UserBookings from "./bookingHistory/UserBookings.jsx";
 import CoolieBookingPage from "./bookingHistory/CoolieBookingPage";
 import AdminPanel from "./pages/AdminPanel";
 import PaymentCheckout from "./payment/PaymentCheckout";
 import Profile from "./usersRegistration/UserProfile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import { ProtectedRouteCoolie } from "./components/ProtectedRouteCoolie.jsx"; // Import Clerk components
+import CoolieLogin from "./authPages/CoolieLogin.jsx";
+import { ProtectedRouteCoolie } from "./components/ProtectedRouteCoolie.jsx";
 
 // Import Clerk components
 
@@ -36,17 +37,17 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
 
         <Route path="/coolie-register" element={<CoolieRegister />} />
+        <Route path="/coolie-login" element={<CoolieLogin />} />
 
         {/* Coolie Profile*/}
 
         <Route
-          path="/coolie-profile"
-          element={
-            <ProtectedRouteCoolie>
-              <CoolieProfile />
-            </ProtectedRouteCoolie>
-          }
-        />
+          path="/coolie-profile/:coolieId"
+          element={<ProtectedRouteCoolie />} // This wraps the route
+        >
+          <Route path="" element={<CoolieProfile />} />{" "}
+          {/* This is the component to render */}
+        </Route>
 
         {/* Protected Routes */}
 
@@ -78,19 +79,19 @@ function App() {
 
         {/* User Booking and Admin Routes */}
         <Route
-          path="/user/my-booking"
+          path="/my-booking"
           element={
             <ProtectedRoute>
-              <ClientBookingPage />
+              <UserBookings />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/coolie-booking"
+          path="/coolie-booking/:coolieId"
           element={
-            <ProtectedRoute>
-              <CoolieBookingPage />
-            </ProtectedRoute>
+            // <ProtectedRoute>
+            <CoolieBookingPage />
+            // </ProtectedRoute>
           }
         />
         <Route

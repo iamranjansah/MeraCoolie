@@ -12,15 +12,21 @@ import { ChevronUpDownIcon } from "@heroicons/react/16/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
 
 const Booking = () => {
+  // Parse the query parameters from the URL
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const pnr = queryParams.get("pnr"); // Get the 'pnr' query parameter
+
   const { user, isLoaded, isSignedIn } = useUser(); // Get user and auth state from Clerk
   const [trainStatus, setTrainStatus] = useState(null);
   const [selectedStation, setSelectedStation] = useState(null);
+  const [formData, setFormData] = useState({
+    phoneNumber: "",
+    pnr: pnr || "",
+    numberOfBags: "",
+  });
 
-  const location = useLocation();
-
-  // Parse the query parameters from the URL
-  const queryParams = new URLSearchParams(location.search);
-  const pnr = queryParams.get("pnr"); // Get the 'pnr' query parameter
+  const userId = user.id;
 
   // If Clerk is still loading or user is not signed in, redirect to sign-in page
   if (!isLoaded || !isSignedIn) {
@@ -49,9 +55,110 @@ const Booking = () => {
     }
   };
 
+  const handleSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    if (!selectedStation) {
+      alert("Please select a station.");
+      return;
+    }
+
+    const orderData = {
+      pnrNumber: formData.pnr,
+      trainNumber: trainStatus?.trainName || "", // Use trainName from trainStatus
+      journeyDate: new Date().toISOString(), // Update this to the correct journey date if available
+      destinationStation: selectedStation?.station_name || "", // Map selectedStation to destinationStation
+      coolieStation: selectedStation?.station_name || "",
+      totalBags: formData.numberOfBags,
+    };
+
+    console.log(orderData);
+
+    try {
+      await updatePhone();
+
+      const response = await fetch(
+        `http://localhost:5143/api/orders/create-order/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
+        },
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Coolie successfully booked!");
+        const orderId = result.order._id;
+        window.location.href = `/payment-checkout?orderId=${orderId}`;
+
+        // Reset form or redirect to another page
+      } else {
+        alert(`Failed to book coolie: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      alert("An error occurred while booking the coolie.");
+    }
+  };
+
+  const updatePhone = async () => {
+    try {
+      const updatePhoneResponse = await fetch(
+        `http://localhost:5143/api/users/updateProfile/${userId}`, // Your API endpoint
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            updatedProfile: {
+              phone: formData.phoneNumber, // Update phone number here
+            },
+          }),
+        },
+      );
+
+      const updatePhoneData = await updatePhoneResponse.json();
+      if (!updatePhoneData.success) {
+        alert("Failed to update phone number.");
+        return;
+      }
+    } catch (error) {
+      console.error("Error updating phone number: ", error);
+      alert("An error occurred while updating phone number.");
+      return;
+    }
+  };
+
   useEffect(() => {
+    const fetchPhoneNumber = async () => {
+      try {
+        const res = await fetch(`http://localhost:5143/api/users/${userId}`); // Replace with your API endpoint for fetching user data
+        const data = await res.json();
+
+        console.log(data.userProfile.phone);
+
+        if (data.success && data.userProfile.phone) {
+          setFormData((prevState) => ({
+            ...prevState,
+            phoneNumber: data.userProfile.phone, // Set the fetched phone number
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching user phone number:", error);
+      }
+    };
+
+    if (user?.id) {
+      fetchPhoneNumber();
+    }
+
     if (pnr) getTrainStatus(pnr);
-  }, [pnr]);
+  }, [user, pnr]);
 
   return (
     <div className="w-full min-h-screen bg-gray-50 py-12 px-6">
@@ -110,17 +217,40 @@ const Booking = () => {
           </Listbox>
         </div>
         <div>
-          <form className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg space-y-4">
+          <form
+            onSubmit={handleSubmitHandler}
+            className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg space-y-4"
+          >
             {/* PNR Field */}
             <label className="block text-gray-700 font-semibold">
               Enter Your PNR:
             </label>
             <input
-              type="text"
+              type="number"
               value={pnr}
               readOnly
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               placeholder="Enter PNR"
+            />
+
+            {/* Phone No. Field */}
+            <label className="block text-gray-700 font-semibold">
+              Phone No. :
+            </label>
+            <input
+              type="text"
+              value={formData.phoneNumber}
+              onChange={(e) =>
+                setFormData((prevState) => ({
+                  ...prevState,
+                  phoneNumber: e.target.value, // Allow manual input if phone number is not fetched
+                }))
+              }
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              placeholder="Enter your Phone No."
+              maxLength="10"
+              pattern="\d{10}"
+              required
             />
 
             {/* Coolie Preference */}
@@ -149,12 +279,22 @@ const Booking = () => {
             </label>
             <input
               type="number"
+              value={formData.numberOfBags}
+              onChange={(e) =>
+                setFormData((prevState) => ({
+                  ...prevState,
+                  numberOfBags: e.target.value, // Allow manual input if phone number is not fetched
+                }))
+              }
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               placeholder="Enter Number of Bags"
             />
 
             {/* Book Coolie Button */}
-            <button className="w-full py-3 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg font-bold hover:from-teal-400 hover:to-blue-500 transform transition duration-300">
+            <button
+              type="submit"
+              className="w-full py-3 bg-gradient-to-r from-blue-500 to-teal-400 text-white rounded-lg font-bold hover:from-teal-400 hover:to-blue-500 transform transition duration-300"
+            >
               Book Coolie
             </button>
           </form>

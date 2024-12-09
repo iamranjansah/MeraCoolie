@@ -171,7 +171,7 @@ const Profile = () => {
             <label className="block text-gray-700 font-semibold">Phone:</label>
             {editMode ? (
               <input
-                type="text"
+                type="number"
                 name="phone"
                 required
                 value={userData.phone}

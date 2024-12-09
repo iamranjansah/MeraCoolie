@@ -16,7 +16,7 @@ const port = process.env.PORT || 5143; // Set the port number from environment o
 const databaseURL = process.env.DATABASE_URL; // Assuming DATABASE_URL is set in your .env file
 
 const corsOptions = {
-  origin: "http://localhost:5174", // Assuming your frontend is running on port 5173
+  origin: "http://localhost:5173", // Assuming your frontend is running on port 5173
 };
 
 app.use(cors(corsOptions));

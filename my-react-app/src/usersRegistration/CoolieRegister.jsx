@@ -11,6 +11,7 @@ const CoolieRegister = () => {
     password: "",
     available: false,
     location: "",
+    assignedStation: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -51,6 +52,7 @@ const CoolieRegister = () => {
     if (!formData.password || formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters.";
     if (!formData.location) newErrors.location = "Location is required.";
+    if (!formData.assignedStation) newErrors.location = "Station is required.";
 
     return newErrors;
   };
@@ -77,7 +79,12 @@ const CoolieRegister = () => {
 
         console.log(data);
 
-        if (data.success) return navigate("/coolie-profile");
+        if (data && data.id) {
+          // localStorage.setItem("coolieId", data.id);
+          console.log("Coolie ID saved:", data.id);
+        }
+
+        if (data.success) return navigate(`/coolie-profile/${data.id}`);
       } catch (error) {
         console.log(error);
       }
@@ -183,6 +190,24 @@ const CoolieRegister = () => {
             placeholder="Enter your location"
           />
           {errors.location && <p className="text-red-500">{errors.location}</p>}
+        </div>
+
+        {/* Name of Station */}
+        <div>
+          <label className="block text-gray-700 font-semibold">
+            Station Name:
+          </label>
+          <input
+            type="text"
+            name="assignedStation"
+            value={formData.assignedStation}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+            placeholder="Enter your Station Name"
+          />
+          {errors.assignedStation && (
+            <p className="text-red-500">{errors.assignedStation}</p>
+          )}
         </div>
 
         {/*/!* Profile Picture *!/*/}

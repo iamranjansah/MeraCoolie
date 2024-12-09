@@ -3,6 +3,8 @@ import axios from "axios";
 
 import Order from "../models/OrdersModel.js";
 import Coolie from "../models/CoolieModel.js";
+import User from "../models/UserModel.js";
+import mongoose from "mongoose";
 
 async function fetchTrainDetails(trainNumber) {
   const apiUrl = `https://rappid.in/apis/train.php?train_no=${trainNumber}`;
@@ -14,23 +16,26 @@ async function fetchTrainDetails(trainNumber) {
     return trainDetails;
   } catch (error) {
     console.error(`Error fetching train details:`, error.message);
+    throw new Error("Failed to fetch train details.");
   }
 }
 
 export const getTrainStatus = async (req, res) => {
   const { pnr } = req.params;
-
   const pnrUrl = `https://www.trainman.in/pnr/${pnr}`;
   const browser = await puppeteer.launch({ headless: "new" });
 
   try {
     const page = await browser.newPage();
-    await page.setUserAgent("Mozilla/5.0...");
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+    );
     await page.setViewport({ width: 1920, height: 1080 });
-    await page.setDefaultTimeout(60000);
+    await page.setDefaultNavigationTimeout(90000);
 
-    await page.goto(pnrUrl, { waitUntil: "networkidle0", timeout: 60000 });
+    await page.goto(pnrUrl, { waitUntil: "domcontentloaded" });
 
+    // Wait for and extract the train number
     const trainNumberSelector = "div.font-weight-bold u";
     const trainNumber = await page
       .waitForSelector(trainNumberSelector, { timeout: 30000 })
@@ -38,7 +43,7 @@ export const getTrainStatus = async (req, res) => {
 
     console.log(`Train Number for PNR ${pnr}: ${trainNumber}`);
 
-    // Fetch the details for the train number from the API
+    // Fetch train details using the train number
     const trainDetails = await fetchTrainDetails(trainNumber);
 
     res.status(200).json({
@@ -46,13 +51,15 @@ export const getTrainStatus = async (req, res) => {
       message: trainDetails,
     });
   } catch (error) {
-    console.error(`Error fetching train number for PNR ${pnr}:`, error);
+    console.error(`Error fetching train number for PNR ${pnr}:`, error.message);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
     });
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 };
 
@@ -62,14 +69,16 @@ export const bookCoolie = async (req, res) => {
       pnrNumber,
       trainNumber,
       journeyDate,
-      boardingStation,
       destinationStation,
-      passengers,
       coolieStation,
       totalBags,
     } = req.body;
 
     const { userId } = req.params; // Get userId from URL params
+
+    console.log(typeof userId);
+
+    console.log(req.body);
 
     // Validate required fields
     if (
@@ -77,10 +86,7 @@ export const bookCoolie = async (req, res) => {
       !pnrNumber ||
       !trainNumber ||
       !journeyDate ||
-      !boardingStation ||
       !destinationStation ||
-      !Array.isArray(passengers) ||
-      passengers.length === 0 ||
       !coolieStation ||
       !totalBags
     ) {
@@ -90,17 +96,11 @@ export const bookCoolie = async (req, res) => {
       });
     }
 
-    // Extract primary passenger's name
-    const primaryPassengerName = passengers[0]?.name;
-    if (!primaryPassengerName) {
-      return res.status(400).json({
-        success: false,
-        message: "Primary passenger name is missing",
-      });
-    }
-
     // Find the customer by userId (updated from clerkId)
-    const customer = await User.findById(userId); // Using findById to find customer by userId
+    const customer = await User.findOne({ clerkId: userId });
+
+    console.log(customer);
+
     if (!customer) {
       return res.status(404).json({
         success: false,
@@ -126,13 +126,11 @@ export const bookCoolie = async (req, res) => {
       pnrNumber,
       trainNumber,
       journeyDate,
-      boardingStation,
       destinationStation,
-      passengerName: primaryPassengerName,
       coolieId: availableCoolie._id,
       customerId: customer._id,
       coolieStation,
-      totalBags,
+      bags: totalBags,
       orderStatus: "pending",
       paymentStatus: "pending",
     });
@@ -188,12 +186,63 @@ export const bookCoolie = async (req, res) => {
   }
 };
 
+export const cancelCoolie = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { orderStatus, coolieStatus, coolieId } = req.body;
+
+    // Validate the data
+    if (!orderId || !orderStatus || !coolieStatus || !coolieId) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields.",
+      });
+    }
+
+    // Find and update the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found.",
+      });
+    }
+
+    // Update order status
+    order.orderStatus = orderStatus;
+    await order.save();
+
+    // Find and update the coolie status
+    const coolie = await Coolie.findById(coolieId);
+    if (!coolie) {
+      return res.status(404).json({
+        success: false,
+        message: "Coolie not found.",
+      });
+    }
+
+    coolie.status = coolieStatus;
+    await coolie.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Order and Coolie status updated successfully.",
+    });
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
 export const updateOrderDetailsByCoolie = async (req, res) => {
   try {
     const { orderId } = req.params;
     const { totalWeight } = req.body;
 
-    const totalPrice = totalWeight * 20;
+    const totalPrice = totalWeight * 5;
 
     // Validate input
     if (!totalWeight || !totalPrice) {
@@ -215,7 +264,6 @@ export const updateOrderDetailsByCoolie = async (req, res) => {
     // Update the order details
     order.totalWeight = totalWeight;
     order.totalPrice = totalPrice;
-    order.priceUpdatedByCoolie = true;
 
     await order.save();
 
@@ -233,28 +281,107 @@ export const updateOrderDetailsByCoolie = async (req, res) => {
   }
 };
 
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { orderStatus } = req.body;
+
+    // Validate input
+    if (!orderStatus) {
+      return res.status(400).json({
+        success: false,
+        message: "Status is required",
+      });
+    }
+
+    // Find the order
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    // Update the order status
+    order.orderStatus = orderStatus;
+
+    // Save the updated order
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Order status updated to ${orderStatus} successfully`,
+      order,
+    });
+  } catch (err) {
+    console.error("Error updating order status:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const completeOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Find the order by orderId
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update order status and payment status
+    order.orderStatus = "completed";
+    order.paymentStatus = "paid";
+
+    // Save the updated order
+    const updatedOrder = await order.save();
+
+    // Optionally, you can handle any other logic, like sending notifications, etc.
+
+    // Send response with updated order details
+    res.status(200).json({
+      message: "Order completed successfully",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error completing order:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const getAllOrders = async (req, res) => {
   try {
     const { userId } = req.params;
 
     if (!userId) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "User Id is required",
       });
     }
 
-    const user = await User.findById(userId).populate({
+    const user = await User.findOne({ clerkId: userId }).populate({
       path: "orderDetails.orders",
       model: "Order",
+      populate: {
+        path: "coolieId", // Populate the coolie details in each order
+        model: "Coolie",
+        select: "firstName lastName phoneNumber", // Select only relevant fields from the coolie
+      },
     });
 
     if (!user) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "User not found",
       });
     }
+
+    // console.log(user.orderDetails.orders[0].coolieId);
 
     // If user is found, return the orders
     return res.status(200).json({
@@ -268,6 +395,81 @@ export const getAllOrders = async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  }
+};
+
+export const getAllCoolieOrders = async (req, res) => {
+  const { coolieId } = req.params; // Extract coolieId from route parameters
+
+  // Validate coolieId
+  if (!coolieId) {
+    return res.status(400).json({ message: "Coolie ID is required." });
+  }
+
+  try {
+    // Step 1: Find the coolie by coolieId
+    const coolie = await Coolie.findById(coolieId);
+    if (!coolie) {
+      return res.status(404).json({ message: "Coolie not found." });
+    }
+
+    // Step 2: Fetch orders associated with the coolie
+    const orders = await Order.find({ coolieId: coolieId })
+      .populate("customerId", "firstName lastName phone", "User") // Populate full customer details (firstName, lastName, phoneNumber)
+      .select(
+        "id orderStatus totalWeight totalPrice pnrNumber trainNumber bags",
+      ) // Include additional fields in the response
+      .exec();
+
+    if (!orders || orders.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No orders found for this coolie." });
+    }
+
+    // Step 3: Separate orders into categories (accepted, completed, cancelled)
+    const categorizedOrders = {
+      acceptedOrders: [],
+      completedOrders: [],
+      cancelledOrders: [],
+    };
+
+    orders.forEach((order) => {
+      const orderDetails = {
+        orderId: order.id,
+        pnrNo: order.pnrNumber,
+        trainNo: order.trainNumber,
+        bags: order.bags,
+        status: order.orderStatus,
+        weight: order.totalWeight,
+        totalPrice: order.totalPrice,
+        customer: order.customerId
+          ? {
+              firstName: order.customerId.firstName, // Populated customer first name
+              lastName: order.customerId.lastName, // Populated customer last name
+              phone: order.customerId.phone, // Populated customer phone number
+            }
+          : null,
+      };
+
+      console.log(orders);
+
+      if (order.orderStatus === "accepted") {
+        categorizedOrders.acceptedOrders.push(orderDetails);
+      } else if (order.orderStatus === "completed") {
+        categorizedOrders.completedOrders.push(orderDetails);
+      } else if (order.orderStatus === "cancelled") {
+        categorizedOrders.cancelledOrders.push(orderDetails);
+      }
+    });
+
+    // Step 4: Send the categorized orders as the response
+    return res.status(200).json(categorizedOrders);
+  } catch (error) {
+    console.error("Error fetching coolie orders:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while fetching orders." });
   }
 };
 
@@ -288,6 +490,8 @@ export const getOrderDetails = async (req, res) => {
       path: "coolieId customerId", // Populate coolie and customer details
       select: "firstName lastName", // Return only relevant fields
     });
+
+    console.log(order);
 
     // Check if the order exists
     if (!order) {

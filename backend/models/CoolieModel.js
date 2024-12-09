@@ -25,6 +25,10 @@ const coolieSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  coolieLocation: {
+    required: true,
+    type: String,
+  },
   assignedStation: {
     type: String, // Station where the coolie is assigned to work
     required: true,

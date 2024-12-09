@@ -14,37 +14,10 @@ const orderSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  boardingStation: {
-    type: String,
-    required: true,
-  },
   destinationStation: {
     type: String,
     required: true,
   },
-  passengers: [
-    {
-      name: {
-        type: String,
-        required: true,
-      },
-      seatNumber: {
-        type: String,
-        required: true, // Seat number of the passenger
-        // Optional: Add validation for seat number format, if needed
-      },
-      age: {
-        type: Number,
-        min: 0, // Ensure that age is a positive number
-        required: false,
-      },
-      gender: {
-        type: String,
-        enum: ["male", "female", "other", "prefer_not_to_say"], // Added "prefer_not_to_say" option
-        required: false,
-      },
-    },
-  ], // An array of passengers for the given PNR
   coolieId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User", // Reference to the Coolie assigned
@@ -71,7 +44,6 @@ const orderSchema = new mongoose.Schema({
   },
   totalPrice: {
     type: Number,
-    required: true,
   },
   bags: {
     type: Number,
@@ -79,7 +51,6 @@ const orderSchema = new mongoose.Schema({
   },
   totalWeight: {
     type: Number,
-    required: true,
   },
   feedback: {
     rating: {

@@ -1,6 +1,7 @@
 import User from "../models/UserModel.js";
 import Coolie from "../models/CoolieModel.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const getUserProfile = async (req, res) => {
   try {
@@ -50,9 +51,25 @@ export const getUserProfile = async (req, res) => {
 
 export const registerCoolie = async (req, res) => {
   try {
-    const { email, password, phone, firstName, lastName, location } = req.body;
+    const {
+      email,
+      password,
+      phone,
+      firstName,
+      lastName,
+      location,
+      assignedStation,
+    } = req.body;
 
-    if (!email || !password || !firstName || !lastName || !phone || !location) {
+    if (
+      !email ||
+      !password ||
+      !firstName ||
+      !lastName ||
+      !phone ||
+      !location ||
+      !assignedStation
+    ) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required" });
@@ -76,7 +93,8 @@ export const registerCoolie = async (req, res) => {
       firstName,
       lastName,
       phoneNumber: phone,
-      assignedStation: location,
+      assignedStation,
+      coolieLocation: location,
     });
     await coolie.save();
 
@@ -84,6 +102,7 @@ export const registerCoolie = async (req, res) => {
       success: true,
       message: "Coolie registered successfully",
       coolie,
+      id: coolie._id,
     });
   } catch (error) {
     console.error("Error registering Coolie:", error);
@@ -116,15 +135,18 @@ export const loginCoolie = async (req, res) => {
       });
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: coolie._id }, "your_secret_key", {
-      expiresIn: "1d",
-    });
+    // Generate a JWT token, including the role
+    const token = jwt.sign(
+      { id: coolie._id, role: "coolie" }, // Include the role in the payload
+      "your_secret_key",
+      { expiresIn: "1d" },
+    );
 
     res.status(200).json({
       success: true,
       message: "Coolie logged in successfully",
       token,
+      coolieId: coolie._id, // Send the coolieId along with the token
     });
   } catch (error) {
     console.error("Error logging in Coolie:", error);
@@ -146,6 +168,8 @@ export const getCoolieProfile = async (req, res) => {
       });
     }
 
+    console.log(coolieId);
+
     const coolie = await Coolie.findById(coolieId).populate({
       // Orders related to Coolie
       path: "orders",
@@ -163,8 +187,11 @@ export const getCoolieProfile = async (req, res) => {
       firstName: coolie.firstName,
       lastName: coolie.lastName,
       email: coolie.email,
-      phone: coolie.phone,
+      phone: coolie.phoneNumber,
       role: coolie.role,
+      coolieLocation: coolie.coolieLocation,
+      assignedStation: coolie.assignedStation,
+      coolieStatus: coolie.status,
       // Orders related to this coolie
       orders: coolie.orders,
     };
@@ -179,6 +206,17 @@ export const getCoolieProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error",
+    });
+  }
+};
+
+export const getCoolieMonthlyEarnings = async (req, res) => {
+  const { coolieId } = req.params;
+
+  if (!coolieId) {
+    return res.status(400).json({
+      success: false,
+      message: "CoolieId is required",
     });
   }
 };
@@ -309,6 +347,8 @@ export const updateCoolieProfile = async (req, res) => {
       });
     }
 
+    console.log(updatedProfile);
+
     // Find the user by userId
     const coolie = await Coolie.findById(coolieId);
 
@@ -338,5 +378,32 @@ export const updateCoolieProfile = async (req, res) => {
       success: false,
       message: "Internal Server error",
     });
+  }
+};
+
+export const updateCoolieStatus = async (req, res) => {
+  const { coolieId } = req.params;
+
+  try {
+    // Find the coolie by coolieId
+    const coolie = await Coolie.findById(coolieId);
+    if (!coolie) {
+      return res.status(404).json({ message: "Coolie not found" });
+    }
+
+    // Update coolie status to 'active'
+    coolie.status = "active";
+
+    // Save the updated coolie
+    const updatedCoolie = await coolie.save();
+
+    // Send response with updated coolie details
+    res.status(200).json({
+      message: "Coolie status updated to active",
+      coolie: updatedCoolie,
+    });
+  } catch (error) {
+    console.error("Error updating coolie status:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

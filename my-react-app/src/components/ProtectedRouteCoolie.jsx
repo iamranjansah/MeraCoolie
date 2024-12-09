@@ -2,25 +2,29 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export const ProtectedRouteCoolie = () => {
-  const token = localStorage.getItem("token"); // Assuming token is saved in localStorage
+  const token = localStorage.getItem("coolieToken");
 
   if (!token) {
-    // Redirect to login page if no token
-    return <Navigate to="/login" />;
+    // If no token, redirect to login page
+    return <Navigate to="/coolie-login" />;
   }
 
   try {
-    // Optionally, verify if the token belongs to a coolie (by decoding it, for example)
-    const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode JWT
+    // Decode JWT token: Split, decode, and parse payload
+    const decodedToken = JSON.parse(atob(token.split(".")[1])); // Decode the payload part of the JWT
+
+    console.log(decodedToken);
+
+    // Check if the decoded token has the 'role' as 'coolie'
     if (decodedToken.role !== "coolie") {
-      // If the user is not a coolie, redirect to a different page (e.g., home or login)
+      // If the role is not "coolie", redirect to home or another page
       return <Navigate to="/" />;
     }
   } catch (error) {
-    // If token is invalid, redirect to login
-    return <Navigate to="/login" />;
+    // If there's an error decoding the token, redirect to login
+    return <Navigate to="/coolie-login" />;
   }
 
-  // If the user is authenticated and authorized, render the child route (outlet)
+  // If the token is valid and the user is a coolie, proceed to the protected content
   return <Outlet />;
 };

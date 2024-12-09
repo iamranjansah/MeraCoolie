@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import { useUser, useClerk } from "@clerk/clerk-react"; // Import Clerk hooks
+import { useClerk, useUser } from "@clerk/clerk-react"; // Import Clerk hooks
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user } = useUser();  // Access the current user from Clerk
-  const { signOut } = useClerk();  // Access Clerk's signOut method
+  const { user } = useUser(); // Access the current user from Clerk
+  const { signOut } = useClerk(); // Access Clerk's signOut method
   const navigate = useNavigate(); // Initialize useNavigate for redirecting
 
   const toggleMenu = () => {
@@ -13,21 +13,25 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    signOut();  // Sign the user out using Clerk's signOut method
-    navigate("/");  // Redirect to the home page
+    signOut(); // Sign the user out using Clerk's signOut method
+    navigate("/"); // Redirect to the home page
   };
 
   return (
     <div>
       <header className="relative flex justify-between items-center px-6 py-4 bg-white shadow-md">
-        <Link to={"/"} className="text-2xl font-bold text-blue-500"><div>Find My Coolie</div></Link>
+        <Link to={"/"} className="text-2xl font-bold text-blue-500">
+          <div>Find My Coolie</div>
+        </Link>
 
         {/* Hamburger Icon for Mobile */}
         <button
           className="lg:hidden text-gray-600 hover:text-blue-500 focus:outline-none"
           onClick={toggleMenu}
         >
-          <i className={`fa ${isMenuOpen ? "fa-times" : "fa-bars"} text-xl`}></i>
+          <i
+            className={`fa ${isMenuOpen ? "fa-times" : "fa-bars"} text-xl`}
+          ></i>
         </button>
 
         {/* Navigation Links */}
@@ -43,22 +47,36 @@ const Navbar = () => {
           </button>
 
           {/* Navigation Links */}
-          <a href="/" className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+          <a
+            href="/"
+            className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block"
+          >
             Home
           </a>
-          <a href="/about" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+          <a
+            href="/about"
+            onClick={toggleMenu}
+            className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block"
+          >
             About Us
           </a>
 
           {/* Conditionally Render 'Booking' Link if User is Logged In */}
           {user && (
-            <a href="/booking" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
-              Booking
+            <a
+              href="/my-booking"
+              onClick={toggleMenu}
+              className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block"
+            >
+              My Booking
             </a>
           )}
 
-          
-          <a href="/contact" onClick={toggleMenu} className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block">
+          <a
+            href="/contact"
+            onClick={toggleMenu}
+            className="text-gray-600 hover:text-blue-500 block py-2 lg:inline-block"
+          >
             Contact Us
           </a>
 
@@ -81,9 +99,7 @@ const Navbar = () => {
             </button>
           ) : (
             // If user is not logged in, show the Sign In button
-            <button
-              className="block py-2 px-4 bg-yellow-400 text-white rounded-full shadow-md hover:bg-yellow-500 w-3/4 mx-auto mt-4 text-center lg:w-auto lg:mt-0 lg:px-6 lg:py-2"
-            >
+            <button className="block py-2 px-4 bg-yellow-400 text-white rounded-full shadow-md hover:bg-yellow-500 w-3/4 mx-auto mt-4 text-center lg:w-auto lg:mt-0 lg:px-6 lg:py-2">
               <Link to="/login" className="text-white hover:text-blue-300">
                 Sign In
               </Link>
